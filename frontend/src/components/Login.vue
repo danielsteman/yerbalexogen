@@ -22,6 +22,3 @@ function login() {
   </button>
 </template>
 
-<style scoped>
-
-</style>
