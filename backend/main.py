@@ -1,11 +1,24 @@
 from fastapi import FastAPI
-from backend.config import AUTH_URL, CLIENT_ID, SCOPE
-from backend.utils import create_code_challenge
+from fastapi.middleware.cors import CORSMiddleware
+from config import AUTH_URL, CLIENT_ID, SCOPE
+from utils import create_code_challenge
 import requests
 
 
 app = FastAPI()
 
+origins = [
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/login")
 async def login():

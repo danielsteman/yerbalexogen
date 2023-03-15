@@ -27,7 +27,11 @@ yarn install
 ```
 
 ## Start local backend server
-`uvicorn backend.main:app --reload`
+Change to `backend` directory first, so we don't have to keep a virtual environment in the root of the project.
+```
+cd backend
+uvicorn main:app --reload
+```
 
 ## Start local frontend server
 `yarn --cwd frontend/ dev`
