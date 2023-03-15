@@ -25,3 +25,4 @@ params = {
 
 res = requests.get(f"{auth_url}", params=params) 
 
+print(res.content)
