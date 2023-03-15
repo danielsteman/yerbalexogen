@@ -11,7 +11,7 @@ CLIENT_SECRET
 ```
 
 ## Install backend dependencies
-Make sure you have installed `virtualenv` and Python 3.10
+Make sure you have installed `virtualenv` and Python 3.10.
 ```
 cd backend
 virtualenv venv
@@ -20,11 +20,14 @@ pip install -r requirements-dev.txt
 ```
 
 ## Install frontend dependencies
-Make sure you have installed a Javascript package manager, I'm using `yarn`
+Make sure you have installed a Javascript package manager, I'm using `yarn`.
 ```
 cd frontend
 yarn install
 ```
 
-## Start local backend webserver
+## Start local backend server
 `uvicorn backend.main:app --reload`
+
+## Start local frontend server
+`yarn --cwd frontend/ dev`
