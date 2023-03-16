@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
+import { RouterLink } from 'vue-router'
 
 const API_URL = "http://localhost:8000/login"
 const redirect_url = ref("")
@@ -17,6 +18,7 @@ function login() {
 </script>
 
 <template>
+  <router-link to="/">Go to Home</router-link>
   <button @click="login">
     Login
   </button>
