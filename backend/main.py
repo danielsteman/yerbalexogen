@@ -33,3 +33,8 @@ async def login():
     }
     res = requests.get(f"{AUTH_URL}", params=params)
     return {"url": res.url}
+
+@app.get("/callback")
+async def callback(code: str):
+    # save code in db
+    return {"status": "received"}
