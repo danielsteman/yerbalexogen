@@ -1,14 +1,19 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import App from '../App.vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import Home from '../components/Home.vue'
+import LoginCallback from '../components/LoginCallback.vue'
 const routes = [
   {
     path: '/',
-    component: App
+    component: Home
+  },
+  {
+    path: '/login/callback',
+    component: LoginCallback
   },
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
 })
 

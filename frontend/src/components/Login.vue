@@ -1,24 +1,19 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
-import { RouterLink } from 'vue-router'
 
-const API_URL = "http://localhost:8000/login"
-const redirect_url = ref("")
+const API_URL = "http://localhost:8000/login";
 
-watchEffect(async () => {
-  redirect_url.value = await (await fetch(API_URL)).json()
-})
-
-function login() {
-  console.log("hoi")
+async function login() {
+  const redirect = await (await fetch(API_URL)).json();
+  const url = redirect.url
+  window.location.href = url
 }
 
 </script>
 
 <template>
-  <router-link to="/">Go to Home</router-link>
-  <button @click="login">
-    Login
-  </button>
+  <div>
+    <button @click="login">
+      Login
+    </button>
+  </div>
 </template>
-
