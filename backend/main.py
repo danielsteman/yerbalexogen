@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from config import AUTH_URL, CLIENT_ID, SCOPE
-from utils import create_code_challenge
+from config import AUTH_URL, CLIENT_ID, CLIENT_SECRET, SCOPE, TOKEN_URL
+from utils import create_code_challenge, create_code_verifier
 import requests
+import json
+from requests.auth import HTTPBasicAuth
 
 
 app = FastAPI()
@@ -22,19 +24,42 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.state.verifier = create_code_verifier()
+
+
 @app.get("/login")
 async def login():
     params = {
         "client_id": CLIENT_ID,
         "scope": SCOPE,
-        "code_challenge": create_code_challenge(),
+        "code_challenge": create_code_challenge(app.state.verifier),
         "code_challenge_method": "S256",
         "response_type": "code",
     }
     res = requests.get(f"{AUTH_URL}", params=params)
     return {"url": res.url}
 
+
+@app.get("/code_verifier")
+async def code_verifier():
+    return {"code_verifier": app.state.verifier}
+
+
 @app.get("/callback")
 async def callback(code: str):
-    # save code in db
+    params = {
+        "client_id": CLIENT_ID,
+        "code": code,
+        "code_verifier": app.state.verifier,
+        "grant_type": "authorization_code",
+    }
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    res = requests.post(
+        TOKEN_URL,
+        auth=HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET),
+        params=params,
+        headers=headers,
+    )
+    body = json.loads(res.content)
+    app.state.access_token = body["access_token"]
     return {"status": "received"}
