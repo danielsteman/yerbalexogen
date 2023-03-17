@@ -1,13 +1,28 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from config import AUTH_URL, CLIENT_ID, CLIENT_SECRET, SCOPE, TOKEN_URL
-from utils import create_code_challenge, create_code_verifier
-import requests
 import json
+import models
+import requests
+from config import AUTH_URL, CLIENT_ID, CLIENT_SECRET, SCOPE, TOKEN_URL
+from db import SessionLocal, engine
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from models import FitbitToken
 from requests.auth import HTTPBasicAuth
+from sqlalchemy.orm import Session
+from utils import create_code_challenge, create_code_verifier
+import schemas
 
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 
 origins = [
     "http://127.0.0.1:5173",
@@ -46,10 +61,10 @@ async def code_verifier():
 
 
 @app.get("/callback")
-async def callback(code: str):
+async def callback(code: schemas.TokenCreate, db: Session = Depends(get_db)):
     params = {
         "client_id": CLIENT_ID,
-        "code": code,
+        "code": code.code,
         "code_verifier": app.state.verifier,
         "grant_type": "authorization_code",
     }
@@ -61,5 +76,11 @@ async def callback(code: str):
         headers=headers,
     )
     body = json.loads(res.content)
-    app.state.access_token = body["access_token"]
-    return {"status": "received"}
+    body["session_id"] = code.session_id
+
+    db_token = FitbitToken(**body)
+    db.add(db_token)
+    db.commit()
+    db.refresh(db_token)
+
+    return db_token
