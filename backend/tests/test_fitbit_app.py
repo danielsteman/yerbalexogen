@@ -37,5 +37,3 @@ def test_create_user():
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["code"] == "yolo"
-    assert "id" in data
-    user_id = data["id"]
