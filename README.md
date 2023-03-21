@@ -27,11 +27,14 @@ yarn install
 ```
 
 ## Start local backend server
-Change to `backend` directory first, so we don't have to keep a virtual environment in the root of the project.
+Create virtual environment in `/backend`, install dependencies with `pip install requirements-dev.txt`, then from `/` run the following command:
 ```
-cd backend
-uvicorn main:app --reload
+uvicorn backend.main:app --reload
 ```
 
 ## Start local frontend server
-`yarn --cwd frontend/ dev`
+```
+cd frontend
+yarn install
+yarn dev
+```

@@ -3,8 +3,9 @@ from backend import models
 import requests
 from backend.config import AUTH_URL, CLIENT_ID, CLIENT_SECRET, SCOPE, TOKEN_URL
 from backend.db import SessionLocal, engine
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from requests.auth import HTTPBasicAuth
 from sqlalchemy.orm import Session
 from backend.utils import create_code_challenge, create_code_verifier
@@ -38,7 +39,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(SessionMiddleware, secret_key="some-random-string")
+
 app.state.verifier = create_code_verifier()
+
+
+@app.middleware("http")
+async def some_middleware(request: Request, call_next):
+    response = await call_next(request)
+    session = request.cookies.get('session')
+    if session:
+        response.set_cookie(key='session', value=request.cookies.get('session'), httponly=True)
+    return response
 
 
 @app.get("/login")
@@ -54,13 +66,15 @@ async def login():
     return {"url": res.url}
 
 
-@app.get("/code_verifier")
-async def code_verifier():
-    return {"code_verifier": app.state.verifier}
+@app.get("/session")
+async def code_verifier(request: Request):
+    return {"session": request.session}
 
 
 @app.get("/callback")
-async def callback(code: schemas.TokenCreate, db: Session = Depends(get_db)):
+async def callback(
+    code: schemas.TokenCreate, request: Request, db: Session = Depends(get_db)
+):
     params = {
         "client_id": CLIENT_ID,
         "code": code.code,
@@ -75,7 +89,8 @@ async def callback(code: schemas.TokenCreate, db: Session = Depends(get_db)):
         headers=headers,
     )
     body = json.loads(res.content)
-    body["session_id"] = code.session_id
+
+    print(request.session)
 
     db_token = models.FitbitToken(**body)
     db.add(db_token)
