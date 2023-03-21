@@ -1,7 +1,7 @@
 import json
 from backend import models
 import requests
-from config import AUTH_URL, CLIENT_ID, CLIENT_SECRET, SCOPE, TOKEN_URL
+from backend.config import AUTH_URL, CLIENT_ID, CLIENT_SECRET, SCOPE, TOKEN_URL
 from backend.db import SessionLocal, engine
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware

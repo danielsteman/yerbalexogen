@@ -3,7 +3,7 @@ from sqlalchemy import Column, String, Integer
 
 
 class FitbitToken(Base):
-    session_id = Column(String)
+    session_id = Column(String, primary_key=True)
     access_token = Column(String)
     expires_in = Column(Integer)
     refresh_token = Column(String)

@@ -30,9 +30,9 @@ client = TestClient(app)
 
 
 def test_create_user():
-    response = client.post(
+    response = client.get(
         "/callback/",
-        json={"code": "yolo", "session_id": "sessiontestid"},
+        params={"code": "yolo", "session_id": "sessiontestid"},
     )
     assert response.status_code == 200, response.text
     data = response.json()
