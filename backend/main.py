@@ -1,15 +1,14 @@
 import json
-import models
+from backend import models
 import requests
 from config import AUTH_URL, CLIENT_ID, CLIENT_SECRET, SCOPE, TOKEN_URL
-from db import SessionLocal, engine
+from backend.db import SessionLocal, engine
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from models import FitbitToken
 from requests.auth import HTTPBasicAuth
 from sqlalchemy.orm import Session
-from utils import create_code_challenge, create_code_verifier
-import schemas
+from backend.utils import create_code_challenge, create_code_verifier
+from backend import schemas
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -78,7 +77,7 @@ async def callback(code: schemas.TokenCreate, db: Session = Depends(get_db)):
     body = json.loads(res.content)
     body["session_id"] = code.session_id
 
-    db_token = FitbitToken(**body)
+    db_token = models.FitbitToken(**body)
     db.add(db_token)
     db.commit()
     db.refresh(db_token)
