@@ -7,10 +7,15 @@ class CRUDFitbitToken:
     def get(self, db: Session, session_id: str):
         return db.query(models.FitbitToken).get(session_id)
 
-    def create(self, db: Session, obj: schemas.TokenCreate):
+    def create(self, db: Session, obj: schemas.Token):
         db_obj = models.FitbitToken(
-            session_id=obj.session_id
-            # WIP
+            session_id=obj.session_id,
+            access_token=obj.access_token,
+            expires_in=obj.expires_in,
+            refresh_token=obj.refresh_token,
+            scope=obj.scope,
+            token_type=obj.token_type,
+            user_id=obj.user_id,
         )
         db.add(db_obj)
         db.commit()

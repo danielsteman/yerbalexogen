@@ -1,3 +1,6 @@
+from typing import Generator
+import pytest
+from sqlalchemy.orm import Session
 import uuid
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -15,15 +18,6 @@ engine = create_engine(
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
-def get_test_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 Base.metadata.create_all(bind=engine)
 
 
@@ -40,9 +34,13 @@ app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
-def test_crud_fitbit_token():
+@pytest.fixture(scope="session")
+def db() -> Generator:
+    yield TestingSessionLocal()
+
+
+def test_crud_fitbit_token(db: Session) -> None:
     session_id = str(uuid.uuid4())
-    test_db_session = get_test_db()
     db_obj = models.FitbitToken(
         session_id=session_id,
         access_token="abc",
@@ -52,6 +50,6 @@ def test_crud_fitbit_token():
         token_type="code",
         user_id="useruser",
     )
-    crud_fitbit_token.create(test_db_session, db_obj)
-    new_token = crud_fitbit_token.get(test_db_session, session_id)
+    crud_fitbit_token.create(db, db_obj)
+    new_token = crud_fitbit_token.get(db, session_id)
     assert new_token.session_id == session_id
