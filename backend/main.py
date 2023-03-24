@@ -73,6 +73,17 @@ async def session_test(request: Request, response: Response):
     return
 
 
+@app.get("/session_exists")
+async def session_exists(request: Request, db: Session = Depends(get_db)):
+    db_obj = (
+        db.query(models.FitbitToken)
+        .filter(models.FitbitToken.session_id == request.cookies.get("session_id"))
+        .first()
+    )
+    all_db_obj = [x for x in db.query(models.FitbitToken).all()]
+    return {"all_db_obj": all_db_obj, "n_db_obj": len(all_db_obj)}
+
+
 @app.get("/callback")
 async def callback(code, response: Response, db: Session = Depends(get_db)):
     params = {
@@ -89,7 +100,7 @@ async def callback(code, response: Response, db: Session = Depends(get_db)):
         headers=headers,
     )
     fitbit_token = json.loads(res.content)
-    session_id = str(uuid.uuid4)
+    session_id = str(uuid.uuid4())
 
     response.set_cookie(key="session_id", value=session_id)
     fitbit_token["session_id"] = session_id
