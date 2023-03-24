@@ -99,4 +99,6 @@ async def callback(code, response: Response, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_token)
 
+    print(db.query(models.FitbitToken).all())
+
     return db_token
