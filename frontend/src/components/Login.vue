@@ -15,13 +15,13 @@ function logout() {
   localStorage.removeItem("sessionId")
 }
 
-interface Login {
-  sessionId: string
-  login: any
-  logout: any
+interface LoginProps {
+  sessionId: string;
+  login: () => void;
+  logout: () => void;
 }
 
-export default defineComponent<Login>({
+export default defineComponent<LoginProps>({
   data() {
     return {
       sessionId: localStorage.getItem("sessionId")
