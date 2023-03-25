@@ -1,27 +1,19 @@
-import json
+from backend import crud
 from backend import models
-import requests
 from backend.config import AUTH_URL, CLIENT_ID, CLIENT_SECRET, SCOPE, TOKEN_URL
-from backend.db import SessionLocal, engine
+from backend.db import engine, get_db
+from backend.utils import create_code_challenge, create_code_verifier
 from fastapi import FastAPI, Depends, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
 from requests.auth import HTTPBasicAuth
 from sqlalchemy.orm import Session
-from backend.utils import create_code_challenge, create_code_verifier
+import json
+import requests
 import uuid
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 origins = [
@@ -39,20 +31,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(SessionMiddleware, secret_key="some-random-string")
+
 app.state.verifier = create_code_verifier()
 
 
 @app.get("/login")
 async def login(request: Request, response: Response, db: Session = Depends(get_db)):
-    # compare cookies in request with session_id in db
-    # logged_in = bool(
-    #     db.query(models.FitbitToken)
-    #     .filter(models.FitbitToken.session_id == request.cookies.get("session_id"))
-    #     .first()
-    # )
-    # print(logged_in)
-
     params = {
         "client_id": CLIENT_ID,
         "scope": SCOPE,
@@ -61,32 +45,11 @@ async def login(request: Request, response: Response, db: Session = Depends(get_
         "response_type": "code",
     }
     res = requests.get(f"{AUTH_URL}", params=params)
-    # if user has no active session (token is not expired) create new session and set in response cookie
-    session_id = str(uuid.uuid4())
-    print(f"session_id created at login: {session_id}")
-    response.set_cookie(key="session_id", value=session_id)
     return {"url": res.url}
 
 
-@app.get("/session")
-async def session_test(request: Request, response: Response):
-    print(request.cookies)
-    return request.cookies
-
-
-@app.get("/session_exists")
-async def session_exists(request: Request, db: Session = Depends(get_db)):
-    db_obj = (
-        db.query(models.FitbitToken)
-        .filter(models.FitbitToken.session_id == "0cac45e2-3773-49d5-8261-5d5cb605b381")
-        .first()
-    )
-    all_db_obj = [x for x in db.query(models.FitbitToken).all()]
-    return {"db_obj": db_obj, "all_db_obj": all_db_obj, "n_db_obj": len(all_db_obj)}
-
-
 @app.get("/callback")
-async def callback(code, request: Request, db: Session = Depends(get_db)):
+async def callback(code, db: Session = Depends(get_db)):
     params = {
         "client_id": CLIENT_ID,
         "code": code,
@@ -101,15 +64,8 @@ async def callback(code, request: Request, db: Session = Depends(get_db)):
         headers=headers,
     )
     fitbit_token = json.loads(res.content)
-    print(f"request cookies from callback endpoint: {request.cookies}")
-    fitbit_token["session_id"] = request.cookies.get("session_id")
-
+    session_id = str(uuid.uuid4())
+    fitbit_token["session_id"] = session_id
     db_token = models.FitbitToken(**fitbit_token)
-
-    print(f"db_token session_id: {db_token.session_id}")
-
-    # db.add(db_token)
-    # db.commit()
-    # db.refresh(db_token)
-
+    crud.crud_fitbit_token.create(db, db_token)
     return db_token

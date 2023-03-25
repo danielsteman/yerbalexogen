@@ -3,6 +3,15 @@
 import { onMounted } from "vue";
 import { useRoute } from 'vue-router';
 import axios from 'axios';
+import { store } from '../store'
+
+export default {
+  data() {
+    return {
+      store
+    }
+  }
+}
 
 const route = useRoute()
 
@@ -13,8 +22,9 @@ onMounted(() => {
     params: {
       code: code
     }
-  });
+  }).then(data => console.log(data));
 })
+
 
 </script>
 
