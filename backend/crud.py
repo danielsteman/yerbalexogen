@@ -1,10 +1,11 @@
+from typing import Optional
 from sqlalchemy.orm import Session
 from backend import schemas
 from backend import models
 
 
 class CRUDFitbitToken:
-    def get(self, db: Session, session_id: str):
+    def get(self, db: Session, session_id: str) -> Optional[models.FitbitToken]:
         return db.query(models.FitbitToken).get(session_id)
 
     def create(self, db: Session, obj: schemas.Token):

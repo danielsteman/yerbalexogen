@@ -10,11 +10,12 @@ from sqlalchemy.orm import Session
 import json
 import requests
 import uuid
+from backend.routers import router
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
+app.include_router(router)
 
 origins = [
     "http://127.0.0.1:5173",
@@ -69,3 +70,8 @@ async def callback(code, db: Session = Depends(get_db)):
     db_token = models.FitbitToken(**fitbit_token)
     crud.crud_fitbit_token.create(db, db_token)
     return db_token
+
+
+@app.get("/token")
+async def get_token(session_id: str, db: Session = Depends(get_db)):
+    return crud.crud_fitbit_token.get(db, session_id)

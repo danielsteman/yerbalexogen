@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Login from "./Login.vue";
+import Data from "./Data.vue"
 
 interface Session {
   sessionId: String
@@ -19,9 +20,7 @@ export default defineComponent<Session>({
 
 <template>
   <Login v-if="!sessionId" />
-  <div v-if="sessionId">
-
-  </div>
+  <Data v-if="sessionId" />
 </template>
 
 <style scoped></style>

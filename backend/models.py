@@ -1,8 +1,10 @@
 from backend.db import Base
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, DateTime, String, Integer
+from sqlalchemy.sql import func
 
 
 class FitbitToken(Base):
+    # created = Column(DateTime, default=func.now())
     session_id = Column(String, primary_key=True)
     access_token = Column(String)
     expires_in = Column(Integer)
