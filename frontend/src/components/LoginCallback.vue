@@ -3,7 +3,6 @@
 import { onMounted } from "vue";
 import { useRoute } from 'vue-router';
 import axios from 'axios';
-import { store } from '../store'
 import router from "../router";
 
 const route = useRoute()
@@ -15,7 +14,7 @@ onMounted(() => {
     params: {
       code: code
     }
-  }).then(data => store.setSession(data.data.session_id)).then(() => router.push("/"));
+  }).then(data => localStorage.setItem('sessionId', data.data.session_id)).then(() => router.push("/"));
 })
 
 
@@ -23,6 +22,6 @@ onMounted(() => {
 
 <template>
   <div>
-    hoi
+    Welcome! You'll be redirected to the home page.
   </div>
 </template>
