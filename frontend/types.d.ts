@@ -1,0 +1,3 @@
+interface Session {
+  sessionId: String
+}

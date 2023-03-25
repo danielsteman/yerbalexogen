@@ -7,7 +7,6 @@ interface Session {
   sessionId: String
 }
 
-
 export default defineComponent<Session>({
   data() {
     return {
@@ -19,7 +18,7 @@ export default defineComponent<Session>({
 </script>
 
 <template>
-  <Login v-if="!sessionId" />
+  <Login />
   <Data v-if="sessionId" />
 </template>
 
