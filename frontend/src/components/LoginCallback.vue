@@ -4,14 +4,7 @@ import { onMounted } from "vue";
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import { store } from '../store'
-
-export default {
-  data() {
-    return {
-      store
-    }
-  }
-}
+import router from "../router";
 
 const route = useRoute()
 
@@ -22,7 +15,7 @@ onMounted(() => {
     params: {
       code: code
     }
-  }).then(data => console.log(data));
+  }).then(data => store.setSession(data.data.session_id)).then(() => router.push("/"));
 })
 
 
