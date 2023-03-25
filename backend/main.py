@@ -46,12 +46,12 @@ app.state.verifier = create_code_verifier()
 @app.get("/login")
 async def login(request: Request, response: Response, db: Session = Depends(get_db)):
     # compare cookies in request with session_id in db
-    logged_in = bool(
-        db.query(models.FitbitToken)
-        .filter(models.FitbitToken.session_id == request.cookies.get("session_id"))
-        .first()
-    )
-    print(logged_in)
+    # logged_in = bool(
+    #     db.query(models.FitbitToken)
+    #     .filter(models.FitbitToken.session_id == request.cookies.get("session_id"))
+    #     .first()
+    # )
+    # print(logged_in)
 
     params = {
         "client_id": CLIENT_ID,
@@ -62,30 +62,31 @@ async def login(request: Request, response: Response, db: Session = Depends(get_
     }
     res = requests.get(f"{AUTH_URL}", params=params)
     # if user has no active session (token is not expired) create new session and set in response cookie
-    response.set_cookie(key="session_id", value=str(uuid.uuid4()))
+    session_id = str(uuid.uuid4())
+    print(f"session_id created at login: {session_id}")
+    response.set_cookie(key="session_id", value=session_id)
     return {"url": res.url}
 
 
 @app.get("/session")
 async def session_test(request: Request, response: Response):
     print(request.cookies)
-    # response.set_cookie(key="sid", value=str(uuid.uuid4()))
-    return
+    return request.cookies
 
 
 @app.get("/session_exists")
 async def session_exists(request: Request, db: Session = Depends(get_db)):
     db_obj = (
         db.query(models.FitbitToken)
-        .filter(models.FitbitToken.session_id == request.cookies.get("session_id"))
+        .filter(models.FitbitToken.session_id == "0cac45e2-3773-49d5-8261-5d5cb605b381")
         .first()
     )
     all_db_obj = [x for x in db.query(models.FitbitToken).all()]
-    return {"all_db_obj": all_db_obj, "n_db_obj": len(all_db_obj)}
+    return {"db_obj": db_obj, "all_db_obj": all_db_obj, "n_db_obj": len(all_db_obj)}
 
 
 @app.get("/callback")
-async def callback(code, response: Response, db: Session = Depends(get_db)):
+async def callback(code, request: Request, db: Session = Depends(get_db)):
     params = {
         "client_id": CLIENT_ID,
         "code": code,
@@ -100,16 +101,15 @@ async def callback(code, response: Response, db: Session = Depends(get_db)):
         headers=headers,
     )
     fitbit_token = json.loads(res.content)
-    session_id = str(uuid.uuid4())
-
-    response.set_cookie(key="session_id", value=session_id)
-    fitbit_token["session_id"] = session_id
+    print(f"request cookies from callback endpoint: {request.cookies}")
+    fitbit_token["session_id"] = request.cookies.get("session_id")
 
     db_token = models.FitbitToken(**fitbit_token)
-    db.add(db_token)
-    db.commit()
-    db.refresh(db_token)
 
-    print(db.query(models.FitbitToken).all())
+    print(f"db_token session_id: {db_token.session_id}")
+
+    # db.add(db_token)
+    # db.commit()
+    # db.refresh(db_token)
 
     return db_token
