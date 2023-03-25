@@ -3,7 +3,7 @@ from backend import models
 from backend.config import AUTH_URL, CLIENT_ID, CLIENT_SECRET, SCOPE, TOKEN_URL
 from backend.db import engine, get_db
 from backend.utils import create_code_challenge, create_code_verifier
-from fastapi import FastAPI, Depends, Request, Response
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from requests.auth import HTTPBasicAuth
 from sqlalchemy.orm import Session
@@ -36,7 +36,7 @@ app.state.verifier = create_code_verifier()
 
 
 @app.get("/login")
-async def login(request: Request, response: Response, db: Session = Depends(get_db)):
+async def login():
     params = {
         "client_id": CLIENT_ID,
         "scope": SCOPE,
