@@ -1,21 +1,5 @@
 <script lang="ts">
 
-import axios from 'axios';
-import { defineComponent } from 'vue';
-
-const API_URL = "http://localhost:8000/login";
-
-async function login() {
-  console.log('login')
-  const redirect = await axios.get(API_URL, { withCredentials: true });
-  const url = redirect.data.url
-  window.location.href = url
-}
-
-async function logout() {
-  await localStorage.removeItem("sessionId")
-}
-
 interface LoginProps {
   sessionId: string;
   login: () => void;
@@ -29,6 +13,25 @@ export default defineComponent<LoginProps>({
     }
   }
 })
+
+</script>
+
+<script setup lang="ts">
+
+import axios from 'axios';
+import { defineComponent } from 'vue';
+
+const API_URL = "http://localhost:8000/login";
+
+async function login() {
+  const redirect = await axios.get(API_URL, { withCredentials: true });
+  const url = redirect.data.url
+  window.location.href = url
+}
+
+function logout() {
+  localStorage.removeItem("sessionId")
+}
 
 </script>
 
