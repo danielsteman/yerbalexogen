@@ -14,7 +14,7 @@ async function getData() {
 <template>
   <div>
     <button @click="getData">
-      Get data
+      Get heartrate intraday data
     </button>
   </div>
 </template>
