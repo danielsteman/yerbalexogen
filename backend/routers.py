@@ -30,10 +30,17 @@ def get_hrv_bulk(
     n_days = end_date - start_date
     dates = [start_date + datetime.timedelta(days=i) for i in range(n_days.days + 1)]
 
-    with httpx.Client() as client:
-        headers = {"Authorization": f"Bearer {token.access_token}"}
-        r = client.get(
-            GET_HRV_INTRADAY_BY_INTERVAL(token.user_id, "2023-01-01", "2023-03-25"),
-            headers=headers,
-        )
-        return json.loads(r.content.data)
+    try:
+        with httpx.Client() as client:
+            headers = {"Authorization": f"Bearer {token.access_token}"}
+            r = client.get(
+                GET_HRV_INTRADAY_BY_INTERVAL(token.user_id, "2023-01-01", "2023-03-25"),
+                headers=headers,
+            )
+            if r.status_code != 200:
+                raise HTTPException(r.status_code, r.content)
+            return json.loads(r.content["data"])
+    except Exception as e:
+        raise HTTPException(
+            500, f"Something went wrong while retrieving Fitbit data. Details: {e}"
+        ) from e
