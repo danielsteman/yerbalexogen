@@ -13,6 +13,11 @@ from backend.utils import get_dates_in_between
 router = APIRouter(prefix="/data")
 
 
+def _format(response: httpx.Response):
+    data = json.loads(response.content)
+    return data["hrv"]
+
+
 @router.get("/hrv-bulk")
 def get_hrv_bulk(
     session_id: str,
@@ -43,7 +48,7 @@ def get_hrv_bulk(
                 )
                 if r.status_code != 200:
                     raise HTTPException(r.status_code, r.content)
-                data.append(json.loads(r.content))
+                data.append(_format(r))
             return data
     except Exception:
         raise
