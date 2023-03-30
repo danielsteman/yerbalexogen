@@ -7,6 +7,7 @@ import json
 import datetime
 
 from backend.db import get_db
+from backend.utils import get_dates_in_between
 
 
 router = APIRouter(prefix="/data")
@@ -27,23 +28,25 @@ def get_hrv_bulk(
 
     # Check if token is expired > use refresh token
 
-    n_days = end_date - start_date
-    dates = [start_date + datetime.timedelta(days=i) for i in range(n_days.days + 1)]
+    dates = get_dates_in_between(start_date, end_date)
+    print(f"between {start_date} and {end_date} are {dates}")
 
     try:
         with httpx.Client() as client:
             headers = {"Authorization": f"Bearer {token.access_token}"}
             data = []
             for date in dates:
+                print(date)
                 r = client.get(
                     GET_HRV_INTRADAY_BY_INTERVAL(token.user_id, str(date), str(date)),
                     headers=headers,
                 )
                 if r.status_code != 200:
                     raise HTTPException(r.status_code, r.content)
-                data.append(json.loads(r.content["data"]))
+                data.append(json.loads(r.content))
             return data
     except Exception as e:
-        raise HTTPException(
-            500, f"Something went wrong while retrieving Fitbit data. Details: {e}"
-        ) from e
+        raise
+        # raise HTTPException(
+        #     500, f"Something went wrong while retrieving Fitbit data. Details: {e}"
+        # ) from e
