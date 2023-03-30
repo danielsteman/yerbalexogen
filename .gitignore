@@ -160,3 +160,7 @@ cython_debug/
 #.idea/
 
 .DS_Store
+
+# sqlite3
+test.db
+fitbit_app.db
