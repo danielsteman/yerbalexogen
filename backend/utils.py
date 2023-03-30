@@ -1,7 +1,9 @@
 import base64
+import datetime
 import hashlib
 import os
 import re
+from typing import List, Optional
 
 
 def create_code_verifier() -> str:
@@ -15,3 +17,12 @@ def create_code_challenge(code_verifier: str) -> str:
     code_challenge = base64.urlsafe_b64encode(code_challenge).decode("utf-8")
     code_challenge = code_challenge.replace("=", "")
     return code_challenge
+
+
+def get_dates_in_between(
+    start_date: datetime.date, end_date: datetime.date
+) -> Optional[List[datetime.date]]:
+    if end_date < start_date:
+        return None
+    n_days = end_date - start_date
+    return [start_date + datetime.timedelta(days=i) for i in range(n_days.days + 1)]
