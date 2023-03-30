@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from backend.config import GET_HRV_INTRADAY_BY_INTERVAL, GET_HRV_SUMMARY_BY_DATE
+from backend.config import GET_HRV_INTRADAY_BY_INTERVAL
 from backend import crud
 import httpx
 from sqlalchemy.orm import Session
@@ -45,8 +45,5 @@ def get_hrv_bulk(
                     raise HTTPException(r.status_code, r.content)
                 data.append(json.loads(r.content))
             return data
-    except Exception as e:
+    except Exception:
         raise
-        # raise HTTPException(
-        #     500, f"Something went wrong while retrieving Fitbit data. Details: {e}"
-        # ) from e
