@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException
 from backend.config import GET_HRV_INTRADAY_BY_INTERVAL
 from backend import crud
@@ -19,7 +20,7 @@ def _format(response: httpx.Response):
 
 
 @router.get("/hrv-bulk")
-def get_hrv_bulk(
+async def get_hrv_bulk(
     session_id: str,
     start_date: datetime.date,
     end_date: datetime.date,
@@ -34,21 +35,40 @@ def get_hrv_bulk(
     # Check if token is expired > use refresh token
 
     dates = get_dates_in_between(start_date, end_date)
-    print(f"between {start_date} and {end_date} are {dates}")
+    headers = {"Authorization": f"Bearer {token.access_token}"}
 
-    try:
-        with httpx.Client() as client:
-            headers = {"Authorization": f"Bearer {token.access_token}"}
-            data = []
-            for date in dates:
-                print(date)
-                r = client.get(
-                    GET_HRV_INTRADAY_BY_INTERVAL(token.user_id, str(date), str(date)),
-                    headers=headers,
-                )
-                if r.status_code != 200:
-                    raise HTTPException(r.status_code, r.content)
-                data.append(_format(r))
-            return data
-    except Exception:
-        raise
+    with httpx.Client() as client:
+        headers = {"Authorization": f"Bearer {token.access_token}"}
+        result = []
+        for date in dates:
+            print(date)
+            r = client.get(
+                GET_HRV_INTRADAY_BY_INTERVAL(token.user_id, str(date), str(date)),
+                headers=headers,
+            )
+            result.append(_format(r))
+
+    # async def get(date, client):
+    #     try:
+    #         async with client.get(
+    #             GET_HRV_INTRADAY_BY_INTERVAL(token.user_id, str(date), str(date)),
+    #             headers=headers,
+    #         ) as response:
+    #             resp = await response.read()
+    #             print(
+    #                 "Successfully got url {} with resp of length {}.".format(
+    #                     date, len(resp)
+    #                 )
+    #             )
+    #     except Exception as e:
+    #         raise
+
+    # async with httpx.AsyncClient() as client:
+    #     result = await client.get(
+    #         GET_HRV_INTRADAY_BY_INTERVAL(token.user_id, str(dates[0]), str(dates[0])),
+    #         headers=headers,
+    #     )
+    # result = await get(dates[0], client)
+    # result = await asyncio.gather(*[get(date, client) for date in dates])
+
+    return result
