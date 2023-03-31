@@ -37,7 +37,7 @@ async def get_hrv_bulk(
     dates = get_dates_in_between(start_date, end_date)
     headers = {"Authorization": f"Bearer {token.access_token}"}
 
-    with httpx.Client() as client:
+    with httpx.AsyncClient() as client:
         headers = {"Authorization": f"Bearer {token.access_token}"}
         result = []
         for date in dates:
