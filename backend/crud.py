@@ -33,3 +33,18 @@ class CRUDFitbitToken:
 
 
 crud_fitbit_token = CRUDFitbitToken()
+
+
+class CRUDHRVMinute:
+    def create(self, db: Session, obj: schemas.HRVMinute):
+        db_obj = models.HRVMinute(
+            minute=obj.minute,
+            value=obj.value,
+        )
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
+
+crud_hrv_minute = CRUDHRVMinute()

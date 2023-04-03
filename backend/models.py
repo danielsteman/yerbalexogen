@@ -1,10 +1,8 @@
 from backend.db import Base
-from sqlalchemy import Column, DateTime, String, Integer
-from sqlalchemy.sql import func
+from sqlalchemy import Column, String, Integer
 
 
 class FitbitToken(Base):
-    # created = Column(DateTime, default=func.now())
     session_id = Column(String, primary_key=True)
     access_token = Column(String)
     expires_in = Column(Integer)
@@ -12,3 +10,8 @@ class FitbitToken(Base):
     scope = Column(String)
     token_type = Column(String)
     user_id = Column(String)
+
+
+class HRVMinute(Base):
+    minute = Column(String, primary_key=True)
+    value = Column(String)

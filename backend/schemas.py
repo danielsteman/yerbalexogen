@@ -9,3 +9,8 @@ class Token(BaseModel):
     scope: str
     token_type: str
     user_id: str
+
+
+class HRVMinute(BaseModel):
+    minute: str
+    value: str

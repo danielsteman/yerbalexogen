@@ -37,38 +37,10 @@ async def get_hrv_bulk(
     dates = get_dates_in_between(start_date, end_date)
     headers = {"Authorization": f"Bearer {token.access_token}"}
 
-    with httpx.AsyncClient() as client:
+    with httpx.Client() as client:
         headers = {"Authorization": f"Bearer {token.access_token}"}
-        result = []
-        for date in dates:
-            print(date)
-            r = client.get(
-                GET_HRV_INTRADAY_BY_INTERVAL(token.user_id, str(date), str(date)),
-                headers=headers,
-            )
-            result.append(_format(r))
-
-    # async def get(date, client):
-    #     try:
-    #         async with client.get(
-    #             GET_HRV_INTRADAY_BY_INTERVAL(token.user_id, str(date), str(date)),
-    #             headers=headers,
-    #         ) as response:
-    #             resp = await response.read()
-    #             print(
-    #                 "Successfully got url {} with resp of length {}.".format(
-    #                     date, len(resp)
-    #                 )
-    #             )
-    #     except Exception as e:
-    #         raise
-
-    # async with httpx.AsyncClient() as client:
-    #     result = await client.get(
-    #         GET_HRV_INTRADAY_BY_INTERVAL(token.user_id, str(dates[0]), str(dates[0])),
-    #         headers=headers,
-    #     )
-    # result = await get(dates[0], client)
-    # result = await asyncio.gather(*[get(date, client) for date in dates])
-
-    return result
+        r = client.get(
+            GET_HRV_INTRADAY_BY_INTERVAL(token.user_id, str(dates[0]), str(dates[0])),
+            headers=headers,
+        )
+        return _format(r)
