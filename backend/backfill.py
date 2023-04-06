@@ -1,3 +1,7 @@
+"""
+TODO: Use AsyncClient and optimize for Fitbit API rate limit constraint 
+"""
+
 import time
 import httpx
 import json
