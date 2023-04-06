@@ -27,12 +27,14 @@ for interval in get_interval(start_date, end_date, chunk_size=30):
             headers=headers,
         )
         days = json.loads(r.content)["hrv"]
+        print(f"N days in interval: {len(days)}")
 
-    time.sleep(100)
+    time.sleep(0.1)
 
     inserted_records = 0
 
     for day in days:
+        print(f"N minutes in day: {len(day['minutes'])}")
         for minute in day["minutes"]:
             new_minute = crud.crud_hrv_minute.create(
                 db_session,
@@ -41,4 +43,4 @@ for interval in get_interval(start_date, end_date, chunk_size=30):
             if new_minute:
                 inserted_records += 1
 
-    print(inserted_records)
+    print(f"N inserted: {inserted_records}")

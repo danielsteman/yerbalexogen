@@ -52,8 +52,6 @@ class CRUDHRVMinute:
             db.commit()
             db.refresh(db_obj)
             return db_obj
-        else:
-            print(self.get(db, obj.minute).minute)
 
 
 crud_hrv_minute = CRUDHRVMinute()
