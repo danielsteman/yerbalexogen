@@ -19,7 +19,11 @@ def test_get_dates_in_between_invalid():
 
 
 def test_get_interval():
-    interval = get_interval(datetime.date(2022, 1, 1), datetime.date(2022, 3, 15), 30)
+    interval = get_interval(
+        datetime.date(2022, 1, 1), datetime.date(2022, 3, 15), chunk_size=30
+    )
     assert len(interval) == 3
-    interval = get_interval(datetime.date(2022, 1, 1), datetime.date(2022, 1, 15), 30)
+    interval = get_interval(
+        datetime.date(2022, 1, 1), datetime.date(2022, 1, 15), chunk_size=30
+    )
     assert len(interval) == 1

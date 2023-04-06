@@ -32,8 +32,8 @@ def get_dates_in_between(
 def get_interval(
     start_date: datetime.date,
     end_date: datetime.date,
-    chunk_size: int,
     *,
+    chunk_size: int,
     chunk_unit: Literal["day", "month"] = "day",
 ):
     if chunk_unit == "month":
@@ -57,6 +57,3 @@ def get_interval(
         )
 
     return interval
-
-
-print(get_interval(datetime.date(2022, 1, 1), datetime.date(2022, 3, 15), 30))

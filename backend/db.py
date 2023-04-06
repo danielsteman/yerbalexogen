@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, as_declarative
 from sqlalchemy.ext.declarative import declared_attr
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./fitbit_app.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///backend/fitbit_app.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
 engine = create_engine(
